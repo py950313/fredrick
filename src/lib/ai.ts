@@ -20,7 +20,7 @@ export async function generateDailyReport(
   member: Member,
   weather: WeatherData
 ): Promise<DailyReport> {
-  const model = getGemini().getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = getGemini().getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `你是「${member.name}」，你的個性是：${member.personality}。
 描述：${member.description}
