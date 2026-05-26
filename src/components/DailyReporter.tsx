@@ -4,19 +4,18 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { Member } from "@/lib/members";
 import type { WeatherData } from "@/lib/weather";
-import type { DailyReport } from "@/lib/ai";
+import type { DailyReport, ScenicSpot } from "@/lib/ai";
 
 interface DailyData {
   member: Member;
   weather: WeatherData;
   report: DailyReport;
+  spot: ScenicSpot;
 }
 
 export default function DailyReporter() {
   const [data, setData] = useState<DailyData | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,20 +28,6 @@ export default function DailyReporter() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
-
-  const generatePhoto = async () => {
-    setImageLoading(true);
-    try {
-      const r = await fetch("/api/generate-image");
-      const d = await r.json();
-      if (d.error) throw new Error(d.error);
-      setImageUrl(d.imageUrl);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "圖片生成失敗");
-    } finally {
-      setImageLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -59,7 +44,7 @@ export default function DailyReporter() {
         <p className="font-bold mb-1">糟糕！出錯了</p>
         <p className="text-sm">{error}</p>
         <p className="text-xs mt-2 text-red-400">
-          請確認 .env.local 中的 API 金鑰已正確設定
+          請確認 .env.local 中的 GEMINI_API_KEY 已正確設定
         </p>
       </div>
     );
@@ -67,7 +52,7 @@ export default function DailyReporter() {
 
   if (!data) return null;
 
-  const { member, weather, report } = data;
+  const { member, weather, report, spot } = data;
   const today = new Date().toLocaleDateString("zh-TW", {
     year: "numeric",
     month: "long",
@@ -92,9 +77,7 @@ export default function DailyReporter() {
             />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <p className="text-sm text-amber-500 font-medium mb-1">
-              今日播報員
-            </p>
+            <p className="text-sm text-amber-500 font-medium mb-1">今日播報員</p>
             <h2 className="text-2xl font-bold text-amber-800 mb-3">
               {member.name}
             </h2>
@@ -128,9 +111,7 @@ export default function DailyReporter() {
 
       {/* 餐廳推薦 */}
       <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-3xl p-6 shadow-lg border border-rose-100">
-        <p className="text-rose-500 font-bold text-sm mb-3">
-          🍽️ 今日餐廳推薦
-        </p>
+        <p className="text-rose-500 font-bold text-sm mb-3">🍽️ 今日餐廳推薦</p>
         <div className="bg-white/70 rounded-2xl p-4">
           <div className="flex items-start justify-between mb-2">
             <h3 className="text-xl font-bold text-gray-800">
@@ -149,41 +130,24 @@ export default function DailyReporter() {
         </div>
       </div>
 
-      {/* AI 景點合照 */}
+      {/* 今日台灣景點 */}
       <div className="bg-gradient-to-br from-sky-50 to-indigo-50 rounded-3xl p-6 shadow-lg border border-sky-100">
         <p className="text-sky-600 font-bold text-sm mb-3">
-          📸 今日台灣景點合照
+          📍 今日阿佛想去的台灣景點
         </p>
-        {imageUrl ? (
-          <div className="relative w-full aspect-square rounded-2xl overflow-hidden">
-            <Image
-              src={imageUrl}
-              alt="AI 生成景點合照"
-              fill
-              className="object-cover"
-            />
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-500 text-sm mb-4">
-              點擊下方按鈕，讓 AI 幫 {member.name} 生成今日景點合照！
+        <div className="bg-white/70 rounded-2xl p-5 text-center">
+          <div className="text-6xl mb-3">{spot.emoji}</div>
+          <h3 className="text-2xl font-black text-gray-800 mb-1">{spot.name}</h3>
+          <p className="text-xs text-sky-500 font-medium bg-sky-50 inline-block px-3 py-1 rounded-full mb-3">
+            📌 {spot.county}
+          </p>
+          <p className="text-gray-600 leading-relaxed">{spot.description}</p>
+          <div className="mt-4 pt-4 border-t border-sky-100">
+            <p className="text-sm text-gray-400 italic">
+              {member.name} 今天想帶你去 {spot.name} 玩！✈️
             </p>
-            <button
-              onClick={generatePhoto}
-              disabled={imageLoading}
-              className="bg-sky-500 hover:bg-sky-600 disabled:bg-sky-300 text-white font-bold px-6 py-3 rounded-full transition-colors shadow-md"
-            >
-              {imageLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  AI 生成中...
-                </span>
-              ) : (
-                "✨ 生成 AI 景點合照"
-              )}
-            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
