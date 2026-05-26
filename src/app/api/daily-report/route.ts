@@ -16,7 +16,7 @@ export async function GET() {
   } catch (error) {
     console.error("Daily report error:", error);
     return NextResponse.json(
-      { error: "Failed to generate daily report" },
+      { error: String(error) },
       { status: 500 }
     );
   }
