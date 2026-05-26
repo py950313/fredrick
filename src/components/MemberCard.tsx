@@ -34,7 +34,7 @@ export default function MemberCard({ member, isToday }: Props) {
         <p className="text-xs text-amber-500 font-medium mb-2 bg-amber-50 inline-block px-2 py-0.5 rounded-full">
           {member.personality}
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        <p className="text-sm text-gray-600 leading-relaxed h-20 overflow-y-auto">
           {member.description}
         </p>
       </div>

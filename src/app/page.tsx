@@ -12,7 +12,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black text-amber-800 tracking-tight">
-              🐭 田鼠阿佛
+              田鼠阿佛
             </h1>
             <p className="text-xs text-amber-500">阿佛世界成員大本營</p>
           </div>
