@@ -9,7 +9,7 @@ export async function GET() {
   try {
     const member = getDailyMember();
     const weather = await getKaohsiungWeather();
-    const report = await generateDailyReport(member, weather);
+    const report = generateDailyReport(member, weather);
     const spot = getDailySpot();
 
     return NextResponse.json({ member, weather, report, spot });
